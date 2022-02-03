@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @JsonSerialize
 public class Block {
@@ -18,18 +19,18 @@ public class Block {
     @JsonProperty
     private final String previousHash;
     @JsonProperty
-    private final String data;
+    private final Set<Transaction> transactions;
 
     public Block(int blockNumber,
                  LocalDateTime timeStamp,
                  Long nonce,
                  String previousHash,
-                 String data) {
+                 Set<Transaction> transactions) {
         this.blockNumber = blockNumber;
         this.timeStamp = timeStamp;
         this.nonce = nonce;
         this.previousHash = previousHash;
-        this.data = data;
+        this.transactions = transactions;
     }
 
     public int getBlockNumber() {
@@ -48,8 +49,8 @@ public class Block {
         return previousHash;
     }
 
-    public String getData() {
-        return data;
+    public Set<Transaction> getTransactions() {
+        return transactions;
     }
 
     public void setNonce(Long nonce) {
@@ -63,12 +64,17 @@ public class Block {
                 ", timeStamp=" + timeStamp +
                 ", nonce=" + nonce +
                 ", previousHash='" + previousHash + '\'' +
-                ", data='" + data + '\'' +
+                ", transactions='" + transactions + '\'' +
                 '}';
     }
 
     @JsonGetter
     public String hash() {
         return DigestUtils.sha256Hex(this.toString());
+    }
+
+    public int addTransaction(String sender, String receiver, int amount) {
+        transactions.add(new Transaction(sender, receiver, amount));
+        return blockNumber;
     }
 }
